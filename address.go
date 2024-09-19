@@ -39,3 +39,14 @@ func (addr Address) String() string {
 func (addr Address) Unwrap() common.Address {
 	return common.Address(addr)
 }
+
+type AddressArray []Address
+
+func (arr AddressArray) String() string {
+	res := ""
+	for _, v := range arr {
+		res += v.String()
+	}
+
+	return res
+}
