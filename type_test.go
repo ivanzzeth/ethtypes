@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func TestBigInt(t *testing.T) {
+func TestTypes(t *testing.T) {
 	dsn := "host=172.16.80.124 user=postgres password=gavreqp51.sfg1 dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
@@ -18,6 +18,7 @@ func TestBigInt(t *testing.T) {
 
 	type TestEvent struct {
 		gorm.Model
+		Bytes    Bytes
 		Account  Address
 		Accounts string
 		Amount   BigInt
@@ -31,7 +32,11 @@ func TestBigInt(t *testing.T) {
 	db.Migrator().DropTable(tables...)
 	db.AutoMigrate(tables...)
 
+	b := common.Hex2Bytes("123456")
+
+	t.Log("bytes: ", b)
 	err = db.Save(&TestEvent{
+		Bytes:   b,
 		Account: Address(common.HexToAddress("0x1111")),
 		Accounts: ToString([]common.Address{
 			common.HexToAddress("0x2222"),
