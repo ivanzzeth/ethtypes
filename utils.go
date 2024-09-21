@@ -14,15 +14,20 @@ func ToString(data interface{}) string {
 		return data
 	case []string:
 		strs = data
+	case fmt.Stringer:
+		strs = append(strs, data.String())
 	default:
 		val := reflect.ValueOf(data)
 		switch val.Kind() {
 		case reflect.Slice:
 			for i := 0; i < val.Len(); i++ {
 				elem := val.Index(i)
+				e := elem.Interface()
+
 				if elem.Type().Implements(reflect.TypeOf((*fmt.Stringer)(nil)).Elem()) {
-					e := elem.Interface()
 					strs = append(strs, e.(fmt.Stringer).String())
+				} else {
+					strs = append(strs, ToString(e))
 				}
 			}
 		}

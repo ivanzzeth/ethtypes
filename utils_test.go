@@ -20,4 +20,15 @@ func TestUtils(t *testing.T) {
 		big.NewInt(2),
 		big.NewInt(3),
 	}), `["2","3"]`)
+
+	assert.Equal(t, ToString([][]common.Address{
+		{
+			common.HexToAddress("0x1111"),
+			common.HexToAddress("0x2222"),
+		},
+		{
+			common.HexToAddress("0x3333"),
+			common.HexToAddress("0x4444"),
+		},
+	}), `["[\"0x0000000000000000000000000000000000001111\",\"0x0000000000000000000000000000000000002222\"]","[\"0x0000000000000000000000000000000000003333\",\"0x0000000000000000000000000000000000004444\"]"]`)
 }
