@@ -2,6 +2,7 @@ package ethtypes
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"reflect"
@@ -11,6 +12,9 @@ import (
 
 var bigIntTestVal = BigInt(big.Int{})
 var _ schema.SerializerInterface = &bigIntTestVal
+var _ fmt.Stringer = bigIntTestVal
+var _ json.Marshaler = bigIntTestVal
+var _ json.Unmarshaler = &bigIntTestVal
 
 type BigInt big.Int
 
@@ -30,6 +34,25 @@ func (bi *BigInt) Scan(ctx context.Context, field *schema.Field, dst reflect.Val
 
 func (bi BigInt) Value(ctx context.Context, field *schema.Field, dst reflect.Value, fieldValue interface{}) (interface{}, error) {
 	return bi.Unwrap().String(), nil
+}
+
+func (bi BigInt) MarshalJSON() ([]byte, error) {
+	return bi.Unwrap().MarshalJSON()
+}
+
+func (bi *BigInt) UnmarshalJSON(data []byte) error {
+	rawBi := bi.Unwrap()
+	err := rawBi.UnmarshalJSON(data)
+	if err != nil {
+		return err
+	}
+
+	bi.Set(rawBi)
+	return nil
+}
+
+func (bi *BigInt) Set(i *big.Int) {
+	(*bi) = BigInt(*i)
 }
 
 func (bi BigInt) String() string {

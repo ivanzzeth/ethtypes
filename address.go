@@ -2,6 +2,7 @@ package ethtypes
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -12,6 +13,9 @@ import (
 
 var addrTestVal = Address(common.Address{})
 var _ schema.SerializerInterface = &addrTestVal
+var _ fmt.Stringer = addrTestVal
+var _ json.Marshaler = addrTestVal
+var _ json.Unmarshaler = &addrTestVal
 
 type Address common.Address
 
@@ -30,6 +34,20 @@ func (addr *Address) Scan(ctx context.Context, field *schema.Field, dst reflect.
 
 func (addr Address) Value(ctx context.Context, field *schema.Field, dst reflect.Value, fieldValue interface{}) (interface{}, error) {
 	return strings.ToLower(common.Address(addr).Hex()), nil
+}
+
+func (addr Address) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, addr.String())), nil
+}
+
+func (addr *Address) UnmarshalJSON(data []byte) error {
+	dataStr := strings.ReplaceAll(string(data), "\"", "")
+	if !common.IsHexAddress(dataStr) {
+		return fmt.Errorf("invalid address: %v", dataStr)
+	}
+	*addr = Address(common.HexToAddress(dataStr))
+
+	return nil
 }
 
 func (addr Address) String() string {

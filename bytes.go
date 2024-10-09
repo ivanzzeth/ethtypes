@@ -2,16 +2,21 @@ package ethtypes
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"gorm.io/gorm/schema"
 )
 
 var bytesTestVal = Bytes([]byte{})
 var _ schema.SerializerInterface = &bytesTestVal
+var _ fmt.Stringer = bytesTestVal
+var _ json.Marshaler = bytesTestVal
+var _ json.Unmarshaler = &bytesTestVal
 
 type Bytes []byte
 
@@ -35,6 +40,25 @@ func (b Bytes) Value(ctx context.Context, field *schema.Field, dst reflect.Value
 
 func (b Bytes) Hex() string {
 	return fmt.Sprintf("0x%x", []byte(b))
+}
+
+func (b Bytes) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, b.String())), nil
+}
+
+func (b *Bytes) UnmarshalJSON(data []byte) error {
+	dataStr := strings.ReplaceAll(string(data), "\"", "")
+	byts, err := hexutil.Decode(dataStr)
+	if err != nil {
+		return err
+	}
+
+	b.Set(byts)
+	return nil
+}
+
+func (b *Bytes) Set(data []byte) {
+	*b = Bytes(data)
 }
 
 func (b Bytes) String() string {
