@@ -18,6 +18,11 @@ var _ json.Unmarshaler = &bigIntTestVal
 
 type BigInt big.Int
 
+func NewBigInt(bi *big.Int) *BigInt {
+	wrapper := BigInt(*bi)
+	return &wrapper
+}
+
 func (bi *BigInt) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:

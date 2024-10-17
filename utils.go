@@ -4,7 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
+
+type JsonObj interface {
+	json.Marshaler
+	json.Unmarshaler
+}
+
+func GetTestDb() *gorm.DB {
+	testDb, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
+	return testDb
+}
 
 func ToString(data interface{}) string {
 	strs := []string{}

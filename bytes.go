@@ -20,6 +20,11 @@ var _ json.Unmarshaler = &bytesTestVal
 
 type Bytes []byte
 
+func NewBytes(b []byte) *Bytes {
+	wrapper := Bytes(b)
+	return &wrapper
+}
+
 func (b *Bytes) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:

@@ -19,6 +19,11 @@ var _ json.Unmarshaler = &hashTestVal
 
 type Hash common.Hash
 
+func NewHash(h common.Hash) *Hash {
+	wrapper := Hash(h)
+	return &wrapper
+}
+
 func (hash *Hash) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:

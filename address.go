@@ -19,6 +19,11 @@ var _ json.Unmarshaler = &addrTestVal
 
 type Address common.Address
 
+func NewAddress(addr common.Address) *Address {
+	wrapper := Address(addr)
+	return &wrapper
+}
+
 func (addr *Address) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:

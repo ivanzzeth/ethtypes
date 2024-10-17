@@ -5,24 +5,24 @@ import (
 	"testing"
 
 	"github.com/ethereum/go-ethereum/common"
-	"gorm.io/driver/postgres"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
 func TestTypes(t *testing.T) {
-	dsn := "host=172.16.80.124 user=postgres password=gavreqp51.sfg1 dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		t.Fatal(err)
-	}
+	db := GetTestDb()
+
+	var err error
 
 	type TestEvent struct {
 		gorm.Model
-		Bytes    Bytes
-		Account  Address
-		Accounts string
-		Amount   BigInt
-		Amounts  string
+		Bytes      Bytes
+		Account    Address
+		Accounts   string
+		Amount     *BigInt
+		Amounts    string
+		Values     *GormSlice[*BigInt]
+		JsonValues datatypes.JSONSlice[BigInt]
 	}
 
 	tables := []interface{}{
@@ -35,6 +35,12 @@ func TestTypes(t *testing.T) {
 	b := common.Hex2Bytes("123456")
 
 	t.Log("bytes: ", b)
+
+	slice := NewGormSlice([]*BigInt{
+		NewBigInt(big.NewInt(5)),
+		NewBigInt(big.NewInt(6)),
+		NewBigInt(big.NewInt(7)),
+	})
 	err = db.Save(&TestEvent{
 		Bytes:   b,
 		Account: Address(common.HexToAddress("0x1111")),
@@ -42,14 +48,29 @@ func TestTypes(t *testing.T) {
 			common.HexToAddress("0x2222"),
 			common.HexToAddress("0x3333"),
 		}),
-		Amount: BigInt(*big.NewInt(1)),
+		Amount: NewBigInt(big.NewInt(1)),
 		Amounts: ToString([]*big.Int{
 			big.NewInt(2),
 			big.NewInt(3),
 		}),
+		Values: slice,
+		JsonValues: datatypes.NewJSONSlice([]BigInt{
+			BigInt(*big.NewInt(8)),
+			BigInt(*big.NewInt(9)),
+		}),
 	}).Error
-
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	t.Log("11111")
+	newTestEvent := &TestEvent{}
+	err = db.First(newTestEvent).Error
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Log("22222")
+
+	t.Logf("newTestEvent: %v", newTestEvent)
 }
