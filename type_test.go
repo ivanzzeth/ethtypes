@@ -10,7 +10,7 @@ import (
 )
 
 func TestTypes(t *testing.T) {
-	dsn := "host=172.16.80.124 user=postgres password=gavreqp51.sfg1 dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+	dsn := "host=192.168.31.83 user=postgres password=gavreqp51.sfg1 dbname=postgres port=5432 sslmode=disable TimeZone=Asia/Shanghai"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		t.Fatal(err)
@@ -23,6 +23,7 @@ func TestTypes(t *testing.T) {
 		Accounts string
 		Amount   BigInt
 		Amounts  string
+		Float    BigFloat
 	}
 
 	tables := []interface{}{
@@ -47,9 +48,18 @@ func TestTypes(t *testing.T) {
 			big.NewInt(2),
 			big.NewInt(3),
 		}),
+		Float: BigFloat(*big.NewFloat(2.3)),
 	}).Error
 
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	newTestEvent := &TestEvent{}
+	err = db.First(newTestEvent).Error
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Logf("newTestEvent: %v", newTestEvent)
 }
