@@ -2,6 +2,7 @@ package ethtypes
 
 import (
 	"context"
+	"encoding"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -16,6 +17,8 @@ var _ schema.SerializerInterface = &bigIntTestVal
 var _ fmt.Stringer = bigIntTestVal
 var _ json.Marshaler = bigIntTestVal
 var _ json.Unmarshaler = &bigIntTestVal
+var _ encoding.TextMarshaler = bigIntTestVal
+var _ encoding.TextUnmarshaler = &bigIntTestVal
 
 type BigInt big.Int
 
@@ -67,6 +70,14 @@ func (bi *BigInt) UnmarshalJSON(data []byte) error {
 
 	bi.Set(rawBi)
 	return nil
+}
+
+func (bi BigInt) MarshalText() (text []byte, err error) {
+	return bi.MarshalJSON()
+}
+
+func (bi *BigInt) UnmarshalText(text []byte) error {
+	return bi.UnmarshalJSON(text)
 }
 
 func (bi *BigInt) Set(i *big.Int) {

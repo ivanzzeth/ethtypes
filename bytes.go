@@ -2,6 +2,7 @@ package ethtypes
 
 import (
 	"context"
+	"encoding"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -17,6 +18,8 @@ var _ schema.SerializerInterface = &bytesTestVal
 var _ fmt.Stringer = bytesTestVal
 var _ json.Marshaler = bytesTestVal
 var _ json.Unmarshaler = &bytesTestVal
+var _ encoding.TextMarshaler = bytesTestVal
+var _ encoding.TextUnmarshaler = &bytesTestVal
 
 type Bytes []byte
 
@@ -55,6 +58,14 @@ func (b *Bytes) UnmarshalJSON(data []byte) error {
 
 	b.Set(byts)
 	return nil
+}
+
+func (bi Bytes) MarshalText() (text []byte, err error) {
+	return bi.MarshalJSON()
+}
+
+func (bi *Bytes) UnmarshalText(text []byte) error {
+	return bi.UnmarshalJSON(text)
 }
 
 func (b *Bytes) Set(data []byte) {

@@ -7,6 +7,8 @@ import (
 	"reflect"
 	"strings"
 
+	"encoding"
+
 	"github.com/ethereum/go-ethereum/common"
 	"gorm.io/gorm/schema"
 )
@@ -16,6 +18,8 @@ var _ schema.SerializerInterface = &addrTestVal
 var _ fmt.Stringer = addrTestVal
 var _ json.Marshaler = addrTestVal
 var _ json.Unmarshaler = &addrTestVal
+var _ encoding.TextMarshaler = addrTestVal
+var _ encoding.TextUnmarshaler = &addrTestVal
 
 type Address common.Address
 
@@ -48,6 +52,14 @@ func (addr *Address) UnmarshalJSON(data []byte) error {
 	*addr = Address(common.HexToAddress(dataStr))
 
 	return nil
+}
+
+func (addr Address) MarshalText() (text []byte, err error) {
+	return addr.MarshalJSON()
+}
+
+func (addr *Address) UnmarshalText(text []byte) error {
+	return addr.UnmarshalJSON(text)
 }
 
 func (addr Address) String() string {

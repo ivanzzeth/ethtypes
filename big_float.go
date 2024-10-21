@@ -2,6 +2,7 @@ package ethtypes
 
 import (
 	"context"
+	"encoding"
 	"encoding/json"
 	"fmt"
 	"math/big"
@@ -16,6 +17,8 @@ var _ schema.SerializerInterface = &bigFloatTestVal
 var _ fmt.Stringer = bigFloatTestVal
 var _ json.Marshaler = bigFloatTestVal
 var _ json.Unmarshaler = &bigFloatTestVal
+var _ encoding.TextMarshaler = bigFloatTestVal
+var _ encoding.TextUnmarshaler = &bigFloatTestVal
 
 type BigFloat big.Float
 
@@ -73,6 +76,14 @@ func (bi *BigFloat) UnmarshalJSON(data []byte) error {
 
 	bi.Set(rawBi)
 	return nil
+}
+
+func (bi BigFloat) MarshalText() (text []byte, err error) {
+	return bi.MarshalJSON()
+}
+
+func (bi *BigFloat) UnmarshalText(text []byte) error {
+	return bi.UnmarshalJSON(text)
 }
 
 func (bi *BigFloat) Set(i *big.Float) {

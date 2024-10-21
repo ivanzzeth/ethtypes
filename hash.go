@@ -2,6 +2,7 @@ package ethtypes
 
 import (
 	"context"
+	"encoding"
 	"encoding/json"
 	"fmt"
 	"reflect"
@@ -16,6 +17,8 @@ var _ schema.SerializerInterface = &hashTestVal
 var _ fmt.Stringer = hashTestVal
 var _ json.Marshaler = hashTestVal
 var _ json.Unmarshaler = &hashTestVal
+var _ encoding.TextMarshaler = hashTestVal
+var _ encoding.TextUnmarshaler = &hashTestVal
 
 type Hash common.Hash
 
@@ -43,6 +46,14 @@ func (hash *Hash) UnmarshalJSON(data []byte) error {
 	*hash = Hash(common.HexToHash(dataStr))
 
 	return nil
+}
+
+func (bi Hash) MarshalText() (text []byte, err error) {
+	return bi.MarshalJSON()
+}
+
+func (bi *Hash) UnmarshalText(text []byte) error {
+	return bi.UnmarshalJSON(text)
 }
 
 func (hash Hash) String() string {
