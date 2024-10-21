@@ -22,6 +22,11 @@ var _ encoding.TextUnmarshaler = &bigIntTestVal
 
 type BigInt big.Int
 
+func NewBigInt(b *big.Int) *BigInt {
+	bi := BigInt(*b)
+	return &bi
+}
+
 func (bi BigInt) GormDataType() string {
 	return "numeric"
 }

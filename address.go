@@ -23,6 +23,11 @@ var _ encoding.TextUnmarshaler = &addrTestVal
 
 type Address common.Address
 
+func NewAddress(addr common.Address) *Address {
+	a := Address(addr)
+	return &a
+}
+
 func (addr *Address) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:
@@ -55,11 +60,18 @@ func (addr *Address) UnmarshalJSON(data []byte) error {
 }
 
 func (addr Address) MarshalText() (text []byte, err error) {
-	return addr.MarshalJSON()
+	return addr.Unwrap().MarshalText()
 }
 
 func (addr *Address) UnmarshalText(text []byte) error {
-	return addr.UnmarshalJSON(text)
+	raw := addr.Unwrap()
+	err := raw.UnmarshalText(text)
+	if err != nil {
+		return err
+	}
+
+	*addr = Address(raw)
+	return nil
 }
 
 func (addr Address) String() string {
@@ -68,15 +80,4 @@ func (addr Address) String() string {
 
 func (addr Address) Unwrap() common.Address {
 	return common.Address(addr)
-}
-
-type AddressArray []Address
-
-func (arr AddressArray) String() string {
-	res := ""
-	for _, v := range arr {
-		res += v.String()
-	}
-
-	return res
 }

@@ -22,6 +22,11 @@ var _ encoding.TextUnmarshaler = &bigFloatTestVal
 
 type BigFloat big.Float
 
+func NewBigFloat(b *big.Float) *BigFloat {
+	bi := BigFloat(*b)
+	return &bi
+}
+
 func (bi BigFloat) GormDataType() string {
 	return "numeric"
 }

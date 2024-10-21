@@ -22,6 +22,11 @@ var _ encoding.TextUnmarshaler = &hashTestVal
 
 type Hash common.Hash
 
+func NewHash(b common.Hash) *Hash {
+	bi := Hash(b)
+	return &bi
+}
+
 func (hash *Hash) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:

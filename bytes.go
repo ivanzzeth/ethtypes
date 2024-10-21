@@ -23,6 +23,11 @@ var _ encoding.TextUnmarshaler = &bytesTestVal
 
 type Bytes []byte
 
+func NewBytes(b []byte) *Bytes {
+	bi := Bytes(b)
+	return &bi
+}
+
 func (b *Bytes) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:
