@@ -6,6 +6,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"gorm.io/driver/postgres"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +17,22 @@ func TestTypes(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// make sure it works with real db.
+	testTypes(t, db)
+
+	liteDb, err := gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// make sure it works with sqlite
+	testTypes(t, liteDb)
+}
+
+func testTypes(t *testing.T, db *gorm.DB) {
+	t.Logf("test db %v", db.Dialector.Name())
+
+	var err error
 	type TestEvent struct {
 		gorm.Model
 		Bytes    Bytes

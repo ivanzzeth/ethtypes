@@ -7,6 +7,7 @@ import (
 	"math/big"
 	"reflect"
 
+	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 )
 
@@ -20,6 +21,19 @@ type BigInt big.Int
 
 func (bi BigInt) GormDataType() string {
 	return "numeric"
+}
+
+func (bi BigInt) GormDBDataType(db *gorm.DB, field *schema.Field) string {
+	// use field.Tag, field.TagSettings gets field's tags
+	// checkout https://github.com/go-gorm/gorm/blob/master/schema/field.go for all options
+
+	// returns different database type based on driver name
+	switch db.Dialector.Name() {
+	case "postgres":
+		return "numeric"
+	}
+
+	return "text"
 }
 
 func (bi *BigInt) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
