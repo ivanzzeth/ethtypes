@@ -18,6 +18,10 @@ var _ json.Unmarshaler = &bigFloatTestVal
 
 type BigFloat big.Float
 
+func (bi BigFloat) GormDataType() string {
+	return "numeric"
+}
+
 func (bi *BigFloat) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:

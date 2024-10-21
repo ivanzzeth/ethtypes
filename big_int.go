@@ -18,6 +18,10 @@ var _ json.Unmarshaler = &bigIntTestVal
 
 type BigInt big.Int
 
+func (bi BigInt) GormDataType() string {
+	return "numeric"
+}
+
 func (bi *BigInt) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:
