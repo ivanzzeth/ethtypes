@@ -9,6 +9,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/magiconair/properties/assert"
+	"github.com/shopspring/decimal"
 )
 
 func TestTextEncoding(t *testing.T) {
@@ -17,6 +18,9 @@ func TestTextEncoding(t *testing.T) {
 	}{
 		{
 			encoder: NewAddress(common.HexToAddress("0x1111")),
+		},
+		{
+			encoder: NewBigDecimal(decimal.NewFromFloat(13.14)),
 		},
 		{
 			encoder: NewBigFloat(big.NewFloat(123.456)),
@@ -43,6 +47,9 @@ func TestJsonEncoding(t *testing.T) {
 	}{
 		{
 			encoder: NewAddress(common.HexToAddress("0x1111")),
+		},
+		{
+			encoder: NewBigDecimal(decimal.NewFromFloat(13.14)),
 		},
 		{
 			encoder: NewBigFloat(big.NewFloat(123.456)),
@@ -91,6 +98,14 @@ func testTextEncoder(t *testing.T, encoder textEncoder) {
 	}
 
 	assert.Equal(t, text, newText)
+
+	// support using in mappings
+	m := make(map[textEncoder]bool)
+	assert.Equal(t, false, m[encoder])
+
+	m[encoder] = true
+
+	assert.Equal(t, true, m[encoder])
 }
 
 func testJsonEncoder(t *testing.T, encoder jsonEncoder) {
