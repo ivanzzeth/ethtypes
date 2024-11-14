@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"gorm.io/gorm/schema"
 )
@@ -31,11 +30,11 @@ func NewBytes(b []byte) *Bytes {
 func (b *Bytes) Scan(ctx context.Context, field *schema.Field, dst reflect.Value, dbValue interface{}) (err error) {
 	switch value := dbValue.(type) {
 	case string:
-		// TODO: Validation
-		if !strings.HasPrefix(value, "0x") {
-			value = "0x" + value
+		bts, err := hexutil.Decode(value)
+		if err != nil {
+			return err
 		}
-		*b = Bytes(common.Hex2Bytes(value))
+		*b = Bytes(bts)
 	default:
 		return fmt.Errorf("unsupported data %#v", dbValue)
 	}
